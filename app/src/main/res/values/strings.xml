@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LocalAgent</string>
+    <string name="model_missing_title">No model loaded</string>
+    <string name="model_missing_body">Download Gemma 3 1B IT (.task file) in Chrome, then pick it below. The model runs fully offline after that; this app has no internet permission.</string>
+    <string name="choose_model">Choose model file</string>
+    <string name="copying_model">Copying model into app storage…</string>
+    <string name="loading_model">Loading model…</string>
+    <string name="model_ready">Model ready: %1$s</string>
+    <string name="instruction_hint">What do you want to open? e.g. \"open whatsapp\"</string>
+    <string name="run">Run</string>
+    <string name="thinking">Thinking…</string>
+    <string name="launch">Launch</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_match_title">No matching app found</string>
+    <string name="no_match_body">The model said: %1$s</string>
+    <string name="confirm_launch_title">Open this app?</string>
+    <string name="model_load_failed">Could not load the model file. Make sure it is a Gemma .task file for MediaPipe LLM Inference.</string>
+    <string name="ok_got_it">OK</string>
+</resources>
