@@ -100,14 +100,15 @@ class MainActivity : AppCompatActivity() {
         modelBody.setText(R.string.loading_model)
         chooseModelButton.isEnabled = false
         io.execute {
-            val loaded = Agent.load(this, file)
+            val result = Agent.load(this, file)
             runOnUiThread {
                 modelProgress.visibility = View.GONE
                 chooseModelButton.isEnabled = true
-                if (loaded == null) {
-                    file.delete()
+                result.onFailure { e ->
                     modelBody.setText(R.string.model_load_failed)
-                } else {
+                    debugText.text = "${e.javaClass.simpleName}: ${e.message}"
+                }
+                result.onSuccess { loaded ->
                     agent = loaded
                     modelCard.visibility = View.GONE
                     runButton.isEnabled = true

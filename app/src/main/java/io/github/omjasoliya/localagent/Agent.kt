@@ -34,15 +34,18 @@ class Agent private constructor(private val llm: LlmInference) {
     data class PickResult(val raw: String, val match: AppEntry?)
 
     companion object {
-        /** Returns null if [modelFile] isn't a model MediaPipe can load. */
-        fun load(ctx: Context, modelFile: File): Agent? = try {
+        private const val TAG = "LocalAgent"
+
+        /** Returns a failure with the real exception text if [modelFile] can't be loaded. */
+        fun load(ctx: Context, modelFile: File): Result<Agent> = try {
             val options = LlmInferenceOptions.builder()
                 .setModelPath(modelFile.absolutePath)
                 .setMaxTokens(512)
                 .build()
-            Agent(LlmInference.createFromOptions(ctx, options))
-        } catch (e: Exception) {
-            null
+            Result.success(Agent(LlmInference.createFromOptions(ctx, options)))
+        } catch (e: Throwable) {
+            android.util.Log.e(TAG, "model load failed", e)
+            Result.failure(e)
         }
     }
 }
