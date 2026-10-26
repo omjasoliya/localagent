@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">LocalAgent</string>
     <string name="model_missing_title">No model loaded</string>
-    <string name="model_missing_body">Download Gemma 3 1B IT (.task file) in Chrome, then pick it below. The model runs fully offline after that; this app has no internet permission.</string>
+    <string name="model_missing_body">Get Gemma 3 1B IT (.litertlm file) via AI Edge Gallery or a browser, then pick it below. The model runs fully offline after that; this app has no internet permission.</string>
     <string name="choose_model">Choose model file</string>
     <string name="copying_model">Copying model into app storage…</string>
     <string name="loading_model">Loading model…</string>
@@ -15,6 +15,6 @@
     <string name="no_match_title">No matching app found</string>
     <string name="no_match_body">The model said: %1$s</string>
     <string name="confirm_launch_title">Open this app?</string>
-    <string name="model_load_failed">Could not load the model file. Make sure it is a Gemma .task file for MediaPipe LLM Inference.</string>
+    <string name="model_load_failed">Could not load the model file. Make sure it is a Gemma .litertlm file for the LiteRT-LM runtime.</string>
     <string name="ok_got_it">OK</string>
 </resources>

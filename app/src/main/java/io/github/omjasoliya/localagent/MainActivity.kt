@@ -72,7 +72,9 @@ class MainActivity : AppCompatActivity() {
         io.shutdownNow()
     }
 
-    private fun modelFile() = File(filesDir, "model.task")
+    // Keep the .litertlm extension: the LiteRT-LM loader appears to dispatch by it internally,
+    // and a file renamed to .task gets fed to the old zip-based bundle reader and fails to open.
+    private fun modelFile() = File(filesDir, "model.litertlm")
 
     private fun copyAndLoadModel(uri: Uri) {
         modelProgress.visibility = View.VISIBLE
