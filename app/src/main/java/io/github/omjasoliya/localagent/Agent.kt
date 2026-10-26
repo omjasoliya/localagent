@@ -37,14 +37,14 @@ class Agent private constructor(private val engine: Engine) {
             Package name:
         """.trimIndent()
 
-        // A 1B model's "thinking" tokens can eat the whole output budget before it ever states
-        // the answer; this is a plain one-line classification, so thinking is unneeded overhead.
-        // Near-greedy sampling (low temperature, topK=1) avoids the randomness that was likely
-        // behind the model answering "None" to a clear, unambiguous match.
+        // Disabling thinking entirely was a guess that didn't pan out (still "None" with
+        // near-greedy sampling too). Gemma 3's instruction-tuned models are plausibly trained
+        // to reason before answering, so give it a real (bounded, not unlimited) thinking budget
+        // and enough output room for both the reasoning and the final line.
         val config = ConversationConfig(
-            thinkingConfig = ThinkingConfig(enableThinking = false, thinkingTokenBudget = 0),
+            thinkingConfig = ThinkingConfig(enableThinking = true, thinkingTokenBudget = 512),
             samplerConfig = SamplerConfig(topK = 1, topP = 1.0, temperature = 0.1),
-            maxOutputToken = 64,
+            maxOutputToken = 1024,
         )
         android.util.Log.i(TAG, "prompt (${prompt.length} chars): $prompt")
         val raw = engine.createConversation(config).use { it.sendMessage(prompt).toString() }
