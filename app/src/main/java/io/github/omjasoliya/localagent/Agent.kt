@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
+import com.google.ai.edge.litertlm.SamplerConfig
 import com.google.ai.edge.litertlm.ThinkingConfig
 import java.io.File
 
@@ -17,9 +18,17 @@ class Agent private constructor(private val engine: Engine) {
         // or output cutoff loses catalog tail, never the actual request.
         val prompt = """
             You control an Android phone. Reply with ONLY the package name of the single best
-            matching app for the instruction below, and nothing else. If nothing matches, reply
-            with exactly: NONE
+            matching app for the instruction, and nothing else. If nothing matches, reply with
+            exactly: NONE
 
+            Example:
+            Instruction: open telegram
+            Installed apps, as "Label => package.name":
+            Camera => com.android.camera
+            Telegram => org.telegram.messenger
+            Package name: org.telegram.messenger
+
+            Now do the real one.
             Instruction: $instruction
 
             Installed apps, as "Label => package.name":
@@ -30,8 +39,11 @@ class Agent private constructor(private val engine: Engine) {
 
         // A 1B model's "thinking" tokens can eat the whole output budget before it ever states
         // the answer; this is a plain one-line classification, so thinking is unneeded overhead.
+        // Near-greedy sampling (low temperature, topK=1) avoids the randomness that was likely
+        // behind the model answering "None" to a clear, unambiguous match.
         val config = ConversationConfig(
             thinkingConfig = ThinkingConfig(enableThinking = false, thinkingTokenBudget = 0),
+            samplerConfig = SamplerConfig(topK = 1, topP = 1.0, temperature = 0.1),
             maxOutputToken = 64,
         )
         android.util.Log.i(TAG, "prompt (${prompt.length} chars): $prompt")
