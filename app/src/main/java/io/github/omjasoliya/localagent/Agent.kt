@@ -1,8 +1,10 @@
 package io.github.omjasoliya.localagent
 
 import android.content.Context
+import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
+import com.google.ai.edge.litertlm.ThinkingConfig
 import java.io.File
 
 /** Thin wrapper around Google's on-device LiteRT-LM runtime (fully offline, .litertlm models). */
@@ -11,24 +13,28 @@ class Agent private constructor(private val engine: Engine) {
     /** Asks the model to pick exactly one package from [apps] for free-form [instruction]. */
     fun pickApp(instruction: String, apps: List<AppEntry>): PickResult {
         val catalog = apps.joinToString("\n") { "${it.label} => ${it.packageName}" }
+        // The instruction comes first and the (possibly long) app catalog after, so a context
+        // or output cutoff loses catalog tail, never the actual request.
         val prompt = """
-            You control an Android phone. Below is the list of installed apps as "Label => package.name".
-            The user will give an instruction. Reply with ONLY the package name of the single best matching
-            app from the list, and nothing else. If nothing in the list matches, reply with exactly: NONE
-
-            Apps:
-            $catalog
+            You control an Android phone. Reply with ONLY the package name of the single best
+            matching app for the instruction below, and nothing else. If nothing matches, reply
+            with exactly: NONE
 
             Instruction: $instruction
+
+            Installed apps, as "Label => package.name":
+            $catalog
+
             Package name:
         """.trimIndent()
 
-        val conversation = engine.createConversation()
-        val raw = try {
-            conversation.sendMessage(prompt).toString()
-        } finally {
-            conversation.close()
-        }
+        // A 1B model's "thinking" tokens can eat the whole output budget before it ever states
+        // the answer; this is a plain one-line classification, so thinking is unneeded overhead.
+        val config = ConversationConfig(
+            thinkingConfig = ThinkingConfig(enableThinking = false, thinkingTokenBudget = 0),
+            maxOutputToken = 64,
+        )
+        val raw = engine.createConversation(config).use { it.sendMessage(prompt).toString() }
 
         // The exact shape of Message.toString() isn't something we can pin down ahead of time,
         // so match by substring against the known package list instead of parsing it strictly.
