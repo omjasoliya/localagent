@@ -8,6 +8,17 @@
     -->
     <uses-feature android:name="android.hardware.vulkan.compute" android:required="false" />
 
+    <!--
+      Package visibility (Android 11+): without this, queryIntentActivities only sees a
+      handful of apps instead of everything with a launcher icon.
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
