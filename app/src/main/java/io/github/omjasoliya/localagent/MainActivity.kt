@@ -53,8 +53,12 @@ class MainActivity : AppCompatActivity() {
         resultText = findViewById(R.id.resultText)
         debugText = findViewById(R.id.debugText)
 
-        apps = AppCatalog.list(this)
-        debugText.text = "Installed launchable apps: ${apps.size}"
+        // TEMPORARY diagnostic: a tiny hand-picked catalog, to separate "the model can't handle
+        // a 101-app list" from "the model can't do this task at all." Revert once we know which.
+        apps = AppCatalog.list(this).filter {
+            it.packageName in setOf("com.whatsapp", "com.oplus.camera", "com.android.settings")
+        }
+        debugText.text = "Installed launchable apps (DIAGNOSTIC SUBSET): ${apps.size}"
 
         chooseModelButton.setOnClickListener {
             // Gemma's license is accepted on Google's site; this only picks the file already downloaded.
