@@ -34,7 +34,9 @@ class Agent private constructor(private val engine: Engine) {
             thinkingConfig = ThinkingConfig(enableThinking = false, thinkingTokenBudget = 0),
             maxOutputToken = 64,
         )
+        android.util.Log.i(TAG, "prompt (${prompt.length} chars): $prompt")
         val raw = engine.createConversation(config).use { it.sendMessage(prompt).toString() }
+        android.util.Log.i(TAG, "raw response: $raw")
 
         // The exact shape of Message.toString() isn't something we can pin down ahead of time,
         // so match by substring against the known package list instead of parsing it strictly.
